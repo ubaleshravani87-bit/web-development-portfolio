@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="index.html" class="logo">Your<span>Shravani!!!!.</span></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html" class="active-link">Dashboard</a>
+      <a href="projects.html">Projects</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <button id="logoutBtn" class="nav-btn logout-btn">Logout</button>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="dashboard-container">
+
+      <div class="dashboard-header">
+        <h1>Welcome, <span id="userName">User</span> 👋</h1>
+        <p>You are logged in securely with JWT authentication.</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dash-card">
+          <div class="dash-icon">📁</div>
+          <h3>My Projects</h3>
+          <p>View all my projects</p>
+          <a href="projects.html" class="dash-link">View →</a>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon">✉️</div>
+          <h3>Contact</h3>
+          <p>Send me a message</p>
+          <a href="contact.html" class="dash-link">Contact →</a>
+        </div>
+                <div class="dash-card">
+          <div class="dash-icon">🔐</div>
+          <h3>Security</h3>
+          <p>JWT + bcrypt + SQLite</p>
+          <a href="https://jwt.io/introduction" target="_blank" class="dash-link">Learn JWT →</a>
+        </div>
+        <div class="dash-card">
+          <div class="dash-icon">💼</div>
+          <h3>Internship</h3>
+          <p>RD INFRO Technology</p>
+          <a href="https://www.linkedin.com/company/rd-infro-technology" target="_blank" class="dash-link">View Company →</a>
+        </div>
+      </div>
+
+      <div class="user-info-card">
+        <h3>Your Account Info</h3>
+        <div class="user-info-row">
+          <span>Name:</span>
+          <strong id="infoName">—</strong>
+        </div>
+        <div class="user-info-row">
+          <span>Email:</span>
+          <strong id="infoEmail">—</strong>
+        </div>
+        <div class="user-info-row">
+          <span>Joined:</span>
+          <strong id="infoJoined">—</strong>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Your Name. Built with JWT Authentication.</p>
+  </footer>
+
+  <script>
+    // ============================================
+    // Dashboard Auth Check
+    // ============================================
+    const API_URL = 'http://localhost:5000/api';
+
+    const token = localStorage.getItem('portfolio_token');
+    const userData = localStorage.getItem('portfolio_user');
+
+    // If not logged in → redirect to login
+    if (!token || !userData) {
+      window.location.href = 'login.html';
+    } else {
+      try {
+        const user = JSON.parse(userData);
+
+        document.getElementById('userName').textContent = user.name.split(' ')[0];
+        document.getElementById('infoName').textContent = user.name;
+        document.getElementById('infoEmail').textContent = user.email;
+
+        const joined = user.joined
+          ? new Date(user.joined).toLocaleDateString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            })
+          : 'Today';
+        document.getElementById('infoJoined').textContent = joined;
+
+      } catch (err) {
+        console.error(err);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // ============================================
+    // Logout
+    // ============================================
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('portfolio_token');
+        localStorage.removeItem('portfolio_user');
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+
+</body>
+</html>

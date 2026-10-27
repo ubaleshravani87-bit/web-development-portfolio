@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <a href="index.html" class="logo">Your<span>Shravani!!!!.</span></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="projects.html">Projects</a>
+      <a href="contact.html" class="active-link">Contact</a>
+      <a href="dashboard.html" id="dashboardLink" style="display:none;">Dashboard</a>
+    </nav>
+    <a href="login.html" class="nav-btn" id="loginNavBtn">Login</a>
+  </header>
+
+  <!-- ===== CONTACT FORM ===== -->
+  <section class="contact" style="min-height: 70vh;">
+    <p class="eyebrow">GET IN TOUCH</p>
+    <h2>Let's work together</h2>
+    <p class="section-sub">Have a project in mind? Send me a message and I'll get back to you soon.</p>
+
+    <form class="contact-form" id="contactForm">
+      <div class="form-row">
+        <input type="text" id="contactName" placeholder="Your Name" required>
+        <input type="email" id="contactEmail" placeholder="Your Email" required>
+      </div>
+      <input type="text" id="contactSubject" placeholder="Subject" required>
+      <textarea id="contactMessage" rows="6" placeholder="Your Message..." required></textarea>
+      <button type="submit" class="btn-primary" id="contactBtn">Send Message</button>
+      <p id="contactStatus" class="form-status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>© 2026 Your Name. Let's build something great!</p>
+  </footer>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    // ===== Navbar Dynamic =====
+    const token = localStorage.getItem('portfolio_token');
+    const userData = localStorage.getItem('portfolio_user');
+    const loginNavBtn = document.getElementById('loginNavBtn');
+    const dashboardLink = document.getElementById('dashboardLink');
+
+    if (token && userData && loginNavBtn) {
+      try {
+        JSON.parse(userData);
+        loginNavBtn.textContent = 'Dashboard';
+        loginNavBtn.href = 'dashboard.html';
+        dashboardLink.style.display = 'inline';
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'nav-btn logout-btn';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.style.marginLeft = '8px';
+        logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('portfolio_token');
+          localStorage.removeItem('portfolio_user');
+          window.location.reload();
+        });
+        loginNavBtn.parentNode.insertBefore(logoutBtn, loginNavBtn.nextSibling);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ===== Contact Form Submit =====
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const subject = document.getElementById('contactSubject').value.trim();
+      const message = document.getElementById('contactMessage').value.trim();
+      const status = document.getElementById('contactStatus');
+      const btn = document.getElementById('contactBtn');
+
+      if (!name || !email || !subject || !message) {
+        status.textContent = '⚠ Please fill in all fields.';
+        status.className = 'form-status error';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+
+      try {
+        const response = await fetch(`${API_URL}/contact`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, subject, message })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          status.textContent = `❌ ${data.message || 'Failed to send'}`;
+          status.className = 'form-status error';
+          btn.disabled = false;
+          btn.textContent = 'Send Message';
+          return;
+        }
+
+        status.textContent = '✅ Message sent successfully! I\'ll reply soon.';
+        status.className = 'form-status success';
+        document.getElementById('contactForm').reset();
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+
+      } catch (error) {
+        console.error(error);
+        status.textContent = '❌ Cannot connect to server. Is backend running?';
+        status.className = 'form-status error';
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+      }
+    });
+  </script>
+
+</body>
+</html>

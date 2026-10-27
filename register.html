@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-body">
+
+  <div class="auth-container">
+
+    <!-- Left Branding -->
+    <div class="auth-brand">
+      <a href="index.html" class="logo">Your<span>Shravani!!!!.</span></a>
+      <h2>Create Account 🚀</h2>
+      <p>Join me to explore projects and get in touch easily.</p>
+      <ul class="auth-features">
+        <li>✅ Free forever</li>
+        <li>✅ Secure JWT login</li>
+        <li>✅ Instant access</li>
+      </ul>
+    </div>
+
+    <!-- Right Form -->
+    <div class="auth-form-wrapper">
+      <div class="auth-form-box">
+        <h2>Sign Up</h2>
+        <p class="auth-sub">Create your free account in seconds</p>
+
+        <form id="registerForm" novalidate>
+          <div class="input-group">
+            <label for="regName">Full Name</label>
+            <input
+              type="text"
+              id="regName"
+              placeholder="John Doe"
+              required>
+          </div>
+
+          <div class="input-group">
+            <label for="regEmail">Email Address</label>
+            <input
+              type="email"
+              id="regEmail"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required>
+          </div>
+
+          <div class="input-group">
+            <label for="regPassword">Password</label>
+            <div class="password-wrapper">
+              <input
+                type="password"
+                id="regPassword"
+                placeholder="Min. 6 characters"
+                autocomplete="new-password"
+                required>
+              <button type="button" class="toggle-password" data-target="regPassword">👁</button>
+            </div>
+            <div class="strength-bar">
+              <div class="strength-fill" id="strengthFill"></div>
+            </div>
+            <p class="strength-text" id="strengthText"></p>
+          </div>
+
+          <div class="input-group">
+            <label for="regConfirm">Confirm Password</label>
+            <div class="password-wrapper">
+              <input
+                type="password"
+                id="regConfirm"
+                placeholder="Re-enter password"
+                autocomplete="new-password"
+                required>
+              <button type="button" class="toggle-password" data-target="regConfirm">👁</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary auth-submit" id="registerBtn">
+            Create Account
+          </button>
+
+          <p id="registerStatus" class="form-status" aria-live="polite"></p>
+        </form>
+
+        <p class="auth-switch">
+          Already have an account?
+          <a href="login.html">Sign in →</a>
+        </p>
+
+        <p class="auth-switch" style="margin-top: 10px;">
+          <a href="index.html">← Back to portfolio</a>
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Register Script -->
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    // Password toggle
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (target.type === 'password') {
+          target.type = 'text';
+          btn.textContent = '🙈';
+        } else {
+          target.type = 'password';
+          btn.textContent = '👁';
+        }
+      });
+    });
+
+    // Password strength checker
+    function checkStrength(pw) {
+      let score = 0;
+      if (pw.length >= 6) score++;
+      if (pw.length >= 10) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return score;
+    }
+
+    document.getElementById('regPassword').addEventListener('input', (e) => {
+      const strength = checkStrength(e.target.value);
+      const fill = document.getElementById('strengthFill');
+      const text = document.getElementById('strengthText');
+
+      const levels = [
+        { w: '0%', c: '#e5e7eb', l: '' },
+        { w: '20%', c: '#ef4444', l: 'Very Weak' },
+        { w: '40%', c: '#f97316', l: 'Weak' },
+        { w: '60%', c: '#eab308', l: 'Fair' },
+        { w: '80%', c: '#22c55e', l: 'Strong' },
+        { w: '100%', c: '#16a34a', l: 'Very Strong' }
+      ];
+
+      const lvl = levels[strength];
+      fill.style.width = lvl.w;
+      fill.style.background = lvl.c;
+      text.textContent = lvl.l;
+      text.style.color = lvl.c;
+    });
+
+    // Handle register
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm = document.getElementById('regConfirm').value;
+      const status = document.getElementById('registerStatus');
+      const btn = document.getElementById('registerBtn');
+
+      if (!name || !email || !password || !confirm) {
+        status.textContent = '⚠ Please fill in all fields.';
+        status.className = 'form-status error';
+        return;
+      }
+
+      if (password.length < 6) {
+        status.textContent = '⚠ Password must be at least 6 characters.';
+        status.className = 'form-status error';
+        return;
+      }
+
+      if (password !== confirm) {
+        status.textContent = '⚠ Passwords do not match.';
+        status.className = 'form-status error';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating account...';
+      status.textContent = '';
+
+      try {
+        const response = await fetch(`${API_URL}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          status.textContent = `❌ ${data.message || 'Registration failed'}`;
+          status.className = 'form-status error';
+          btn.disabled = false;
+          btn.textContent = 'Create Account';
+          return;
+        }
+
+        status.textContent = '✅ Account created! Redirecting to login...';
+        status.className = 'form-status success';
+
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+
+      } catch (error) {
+        console.error(error);
+        status.textContent = '❌ Cannot connect to server. Is backend running?';
+        status.className = 'form-status error';
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects | Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <a href="index.html" class="logo">Your<span>Shravani!!!!.</span></a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="projects.html" class="active-link">Projects</a>
+      <a href="contact.html">Contact</a>
+      <a href="dashboard.html" id="dashboardLink" style="display:none;">Dashboard</a>
+    </nav>
+    <a href="login.html" class="nav-btn" id="loginNavBtn">Login</a>
+  </header>
+
+  <!-- ===== PROJECTS SECTION ===== -->
+  <section>
+    <p class="eyebrow">MY WORK</p>
+    <h2>All Projects</h2>
+    <p class="section-sub">A collection of projects I've built during my learning journey.</p>
+
+    <div class="projects-grid" id="projectsGrid">
+      <p style="color: #718096;">Loading projects...</p>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>© 2026 Your Name. All projects built with ❤️</p>
+  </footer>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+
+    // ===== Navbar Dynamic =====
+    const token = localStorage.getItem('portfolio_token');
+    const userData = localStorage.getItem('portfolio_user');
+    const loginNavBtn = document.getElementById('loginNavBtn');
+    const dashboardLink = document.getElementById('dashboardLink');
+
+    if (token && userData && loginNavBtn) {
+      try {
+        JSON.parse(userData);
+        loginNavBtn.textContent = 'Dashboard';
+        loginNavBtn.href = 'dashboard.html';
+        dashboardLink.style.display = 'inline';
+
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'nav-btn logout-btn';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.style.marginLeft = '8px';
+        logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('portfolio_token');
+          localStorage.removeItem('portfolio_user');
+          window.location.reload();
+        });
+        loginNavBtn.parentNode.insertBefore(logoutBtn, loginNavBtn.nextSibling);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ===== Load Projects from API =====
+    async function loadProjects() {
+      const grid = document.getElementById('projectsGrid');
+
+      try {
+        const response = await fetch(`${API_URL}/projects`);
+        const data = await response.json();
+
+        if (!response.ok || !data.projects || data.projects.length === 0) {
+          grid.innerHTML = '<p style="color: #718096;">No projects found.</p>';
+          return;
+        }
+
+        grid.innerHTML = '';
+
+        data.projects.forEach(project => {
+          const card = document.createElement('article');
+          card.className = 'project-card';
+
+          card.innerHTML = `
+            <span class="project-tech">${project.tech}</span>
+            <h3>${project.title}</h3>
+            <p>${project.description}</p>
+            <div class="project-links">
+              ${project.github ? `<a href="${project.github}" target="_blank">Code →</a>` : ''}
+              ${project.live ? `<a href="${project.live}" target="_blank">Live Demo →</a>` : ''}
+            </div>
+          `;
+
+          grid.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error(error);
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 30px; text-align: center; color: #ef4444;">
+            ❌ Cannot load projects. Is backend running on port 5000?
+          </div>
+        `;
+      }
+    }
+
+    loadProjects();
+  </script>
+
+</body>
+</html>

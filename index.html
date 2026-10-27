@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Shravani | Web Developer Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header class="navbar">
+    <a href="index.html" class="logo">Your<span> Shravani!!!.</span></a>
+    <nav>
+      <a href="index.html" class="active-link">Home</a>
+      <a href="projects.html">Projects</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <a href="login.html" class="nav-btn" id="loginNavBtn">Login</a>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="home">
+    <p class="eyebrow">👋 HELLO, I'M</p>
+    <h1>Shravani Ubale<br><span>Web Developer</span></h1>
+    <p class="hero-text">
+      I build clean, responsive and user-friendly websites
+      using HTML, CSS, JavaScript and Node.js.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="projects.html" class="btn-primary">View My Work</a>
+      <a href="contact.html" class="btn-secondary">Contact Me</a>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="about" id="about">
+    <p class="eyebrow">ABOUT ME</p>
+    <h2>Turning ideas into <span>real websites.</span></h2>
+    <p class="about-text">
+      I'm a passionate web developer currently doing a Web Development
+      Internship at RD INFRO TECHNOLOGY. I love building projects that
+      solve real problems and learning new technologies every day.
+      My goal is to become a full-stack developer and work on impactful
+      products.
+    </p>
+  </section>
+
+  <!-- ===== QUICK PROJECTS ===== -->
+  <section id="quick-projects">
+    <p class="eyebrow">MY WORK</p>
+    <h2>Featured Projects</h2>
+    <p class="section-sub">Here are some projects I've built recently.</p>
+
+    <div class="projects-grid">
+      <article class="project-card">
+        <span class="project-tech">HTML • CSS • JS</span>
+        <h3>SmartHire Job Portal</h3>
+        <p>Job search website with real-time filtering and search functionality.</p>
+        <div class="project-links">
+          <a href="projects.html">Details →</a>
+        </div>
+      </article>
+
+      <article class="project-card">
+        <span class="project-tech">JavaScript</span>
+        <h3>To-Do List App</h3>
+        <p>Task manager with localStorage, filters and dark mode.</p>
+        <div class="project-links">
+          <a href="projects.html">Details →</a>
+        </div>
+      </article>
+
+      <article class="project-card">
+        <span class="project-tech">API • JS</span>
+        <h3>Weather App</h3>
+        <p>Weather forecast app using OpenWeatherMap API.</p>
+        <div class="project-links">
+          <a href="projects.html">Details →</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>© 2026 Your Name. Built with ❤️ using HTML, CSS & JavaScript.</p>
+  </footer>
+
+  <script>
+    // ===== Navbar Login/Dashboard Dynamic =====
+    const token = localStorage.getItem('portfolio_token');
+    const userData = localStorage.getItem('portfolio_user');
+    const loginNavBtn = document.getElementById('loginNavBtn');
+
+    if (token && userData && loginNavBtn) {
+      try {
+        const user = JSON.parse(userData);
+        loginNavBtn.textContent = 'Dashboard';
+        loginNavBtn.href = 'dashboard.html';
+
+        // Add logout button
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'nav-btn logout-btn';
+        logoutBtn.textContent = 'Logout';
+        logoutBtn.style.marginLeft = '8px';
+        logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('portfolio_token');
+          localStorage.removeItem('portfolio_user');
+          window.location.reload();
+        });
+
+        loginNavBtn.parentNode.insertBefore(logoutBtn, loginNavBtn.nextSibling);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  </script>
+
+</body>
+</html>
